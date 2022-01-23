@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+	</head>
+	<link rel="stylesheet" href="css/index.css" />
+
+	<body>
+		<div id="templete">
+			<div class="slider">
+				<div v-for="item in pageData">
+					<div class="item" @click="switchItem(item)" :class="{active : item.name == 'Android SDK'}">
+						<div>
+							{{item.name}}
+						</div>
+						<div  class="tagList">
+							<span class="tag" :class="{tagColor1 : tag == '会员套件',tagColor2 : tag == 'API',tagColor3 : tag == 'SDK'}" v-for="tag in item.tags">{{tag}}</span>
+						</div>
+					</div>
+				</div>
+				<div>
+					<div class="updateDataBtn" @click="updateData()">
+						更新文档
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="homePage"></div>
+	</body>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script src="js/vue.js "></script>
+	<script type="text/javascript" src="js/router.js"></script>
+	
+	<script>
+		$("#homePage").load("js/android.html");
+
+		new Vue({
+			el: '#templete',
+			data: {
+				pageData: router,
+				sliderData: [],
+				urlBase: ''
+			},
+			methods: {
+				updateData(){
+					window.openWin = window.open('./websocket.html','','width=400,height=400');
+				},
+				switchItem: function(item) {
+					location.href = item.url;
+				}
+			},
+		})
+	</script>
+
+</html>

@@ -1,0 +1,329 @@
+html{
+	font-family:"微软雅黑","sans serif";
+}
+#templete {
+	width: 1000px;
+	margin: 0 auto;
+	margin-left: 380px;
+}
+
+#homePage {
+	width: 1000px;
+	margin: 0 auto;
+}
+
+[v-cloak]{
+    display: none;
+}
+
+@media only screen and (max-width: 1300px) {
+	#templete {
+		margin-left: 380px;
+	}
+}
+
+code{
+	font-family: Consolas,monospace,tahoma,Arial;
+    padding: 2px 4px;
+    color: #d14;
+}
+
+.apiIList {
+	margin-bottom: 100px;
+}
+
+.apiIList .item>div {
+	margin-top: 50px;
+}
+
+.apiIList .item>div>div {
+	margin-top: 15px;
+}
+
+.apiIList .item>div>table {
+	margin-top: 15px;
+}
+
+.apiIList .item .name {
+	font-size: 20px;
+	font-weight: bold;
+}
+
+table {
+	border-collapse: collapse;
+	min-width: 1000px !important;
+}
+td{
+	empty-cells:show;
+}
+
+table td,th{
+	border: 1px solid black;
+}
+
+.eleTable{
+	width: 100% !important;
+	min-width: 1000px !important;
+	color: #000 !important;
+	border-right : 1px solid #000 !important;
+	border-bottom : 1px solid #000 !important;
+}
+
+.eleTable thead{
+	font-size: 18px !important;
+	color: #000 !important;
+	text-align: center !important;
+}
+
+/* readme 表格 */
+
+thead tr{
+	background-color: #eee;
+}
+
+tbody tr:nth-child(odd) {
+	background-color: #fff;
+}
+
+tbody tr:nth-child(even) {
+	background-color: #eee;
+}
+
+/* 自定义 表格 */
+.apiIList tr:nth-child(odd) {
+	background-color: #eee;
+}
+
+.apiIList tr:nth-child(even) {
+	background-color: #fff;
+}
+/* element 表格 */
+
+.eleTable tr:nth-child(odd) {
+	background-color: #fff;
+}
+
+.eleTable tr:nth-child(even) {
+	background-color: #eee;
+}
+
+.eleTable thead tr th{
+	background-color: #eee !important;
+}
+.eleTable thead tr th div{
+	text-align: center !important;
+}
+
+/* 解决element-ui的table表格控件表头与内容列不对齐问题 */
+.el-table th.gutter{
+    display: table-cell!important;
+}
+
+
+td,
+th {
+	padding: 10px 20px;
+} 
+
+.examples{
+	color: white;
+	background-color: #41444e;
+	border-radius: 8px;
+	padding: 15px;
+}
+
+.slider,.slider2{
+	background: white;
+	z-index: 999;
+}
+
+
+.slider {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 180px;
+	height: 100%;
+}
+
+.slider .item{
+	height: 60px;
+	padding-left: 8px;
+	overflow: hidden;
+	background-color: #eee;
+	border-bottom: 1px solid #fff;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+.activeSlider{
+	background-color:  #fff !important;
+}
+.slider .tagList{
+	margin-top: 3px;
+	display: flex;
+	justify-content: flex-start;
+}
+.slider .tag{
+	background-color: rgb(45, 183, 245);
+	color: white;
+	border-radius: 3px;
+	font-size: 10px;
+	padding: 0px 2px;
+	margin-right: 5px;
+}
+.slider .tagColor1{
+	background-color: rgb(45, 183, 245);
+}
+.slider .tagColor2{
+	background-color: #f50;
+}
+.slider .tagColor3{
+	background-color: #87d068;
+}
+
+.slider2 {
+	position: fixed;
+	left: 180px;
+	top: 0;
+	width: 180px;
+	overflow-y: scroll;
+	height: 100%;
+}
+
+.slider2 .item{
+	line-height: 40px;
+	height: 40px;
+	padding-left: 8px;
+	overflow: hidden;
+	background-color: #eee;
+	border-bottom: 1px solid #fff;
+	cursor: pointer;
+}
+
+.slider2 .subItem{
+    padding-left: 30px;
+}
+
+.slider .active{
+    background-color: #fff;
+}
+.slider2 .active{
+    background-color: #fff;
+}
+
+.models .title{
+	font-size: 30px;
+	text-align: center;
+	font-weight: bold;
+}
+
+.models .name{
+	font-size: 20px;
+	margin-top: 50px;
+	margin-bottom: 15px;
+}
+::-webkit-scrollbar{
+	width: 10px;
+	background : #ccc;
+}
+::-webkit-scrollbar-thumb{
+	background-color: #ccc;
+}
+	
+::-webkit-scrollbar-track{
+	background-color: #eee;
+}
+
+.Gateawayapides .title1{
+	font-size: bold;
+	font-size: 25px;
+}
+
+.Gateawayapides .title2{
+	font-size: 22px;
+}
+
+.Gateawayapides .title3{
+	font-size: 18px;
+}
+.Gateawayapides div{
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.itemDiv{
+	margin-top: 50px;
+}
+
+.title1{
+	font-size: 30px;
+	font-weight: bold;
+}
+.title1Base{
+	font-size: 16px;
+}
+
+.itemDiv > .title2Base{
+	margin-left: 30px;
+}
+
+.title2{
+	margin-top: 15px;
+	font-size: 24px;
+	font-weight: bold;
+}
+.title2Base{
+	font-size: 14px;
+}
+.title3{
+	font-size: 16px;
+	font-weight: bold;
+}
+.title3Base{
+	font-size: 12px;
+}
+
+.header .headerTitle{
+	font-size: 36px;
+	text-align: center;
+	font-weight: bold;
+}
+.header .headerVersion{
+	font-size: 20px;
+	text-align: center;
+	font-weight: bold;
+}
+
+.updateDataBtn{
+	width: 100px;
+	height: 40px;
+	border-radius: 5px;
+	text-align: center;
+	line-height: 40px;
+	color: #fff;
+    background-color: #1890ff;
+	border-color: #1890ff;
+	margin-left: 20px;
+	margin-top: 20px;
+	cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

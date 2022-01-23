@@ -1,0 +1,90 @@
+<h2>全局请求header</h2>
+<table>
+<thead>
+<tr>
+<th>header参数名称</th>
+<th>是否必须</th>
+<th>参数类型</th>
+<th>参数简介</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>x-api-key</td>
+<td>是</td>
+<td>string</td>
+<td>会员SaaS系统分配给接入方的 api key，用于识别接入方</td>
+</tr>
+<tr>
+<td>x-api-secret</td>
+<td>是</td>
+<td>string</td>
+<td>会员SaaS系统分配给接入方的 api secret ，用于权限校验</td>
+</tr>
+<tr>
+<td>Origin</td>
+<td>是</td>
+<td>string</td>
+<td>分配的域名，用来校验是否为安全配置域名 例如: http://www.google.com</td>
+</tr>
+<tr>
+<td>Authorization</td>
+<td>需要登录验证的接口为必须</td>
+<td>string</td>
+<td>参数值为登录请求接口中获取到的 <code>access-token</code> 的值，注意要在获取到的字符串最前面加上<code>Bearer </code></td>
+</tr>
+<tr>
+<td>accept-language</td>
+<td>是</td>
+<td>string</td>
+<td>传入语言</td>
+</tr>
+</tbody>
+</table>
+<h3>Signature 参数</h3>
+<ul>
+<li>
+<p>Signature jwt加密秘钥</p>
+<p>网关会分配给接入方一个<code>secret</code>，这个<code>secret</code>， 由网关统一管理分发 ，此<code>secret</code>用来加密<code>Signaturre</code>参数jwt字符串。</p>
+</li>
+<li>
+<p>Signature jwt payload 详情</p>
+<p>在请求时候需要通过秘钥添加入jwt生成相应的 Signature 字符串添加到请求header中， 然后在 JWT 的 <code>payload</code> 字段中添加如下终端信息参数，此参数每次接口请求时候都必须带上，可以访问 jwt.io 加密&amp;验证。</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>是否必须</th>
+<th>参数类型</th>
+<th>参数描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>iss</td>
+<td>是</td>
+<td>string</td>
+<td>此参数为固定值 member-account-system-kit</td>
+</tr>
+<tr>
+<td>exp</td>
+<td>是</td>
+<td>int</td>
+<td>过期时间，为当前uninx时间戳+7200秒，例：1545726078</td>
+</tr>
+<tr>
+<td>alg</td>
+<td>是</td>
+<td>string</td>
+<td>加密方式 ，固定值：HS256</td>
+</tr>
+<tr>
+<td>x-client-info</td>
+<td>是</td>
+<td></td>
+<td>合并x-client-info内容</td>
+</tr>
+</tbody>
+</table>

@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+	</head>
+	<link rel="stylesheet" href="css/index.css" />
+	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+	<body>
+		<div id="templete" v-cloak>
+			<div class="slider">
+				<div v-for="(item,pageIndex) in pageData">
+					<div class="item" @click="switchItem(item)" :class="{active : item.name == '合作伙伴后端API'}">
+						<div>
+							{{item.name}}
+						</div>
+						<div class="tagList">
+							<span class="tag" :class="{tagColor1 : tag == '会员套件',tagColor2 : tag == 'API',tagColor3 : tag == 'SDK'}" v-for="tag in item.tags">{{tag}}</span>
+						</div>
+					</div>
+				</div>
+				<div>
+					<div class="updateDataBtn" @click="updateData()">
+						更新文档
+					</div>
+				</div>
+			</div>
+			<div class="slider2">
+				<div v-for="(item,index) in sliderData">
+					<div class="item" @click="switchItem(item)" :class="{active : item.active == 'Y'}">
+						{{item.name}}
+					</div>
+					<div class="item subItem" :class="{active : subItem.active == 'Y'}" v-for="(subItem , subItemIndex) in item.arr"
+					 @click="scrollToItem(subItem)">
+						{{subItem.name}}
+					</div>
+				</div>
+			</div>
+			<div class="header" v-if="data && data.titleInfo">
+				<div class="headerTitle">{{data.titleInfo.title}}</div>
+				<div class="headerVersion">{{data.titleInfo.version}}</div>
+			</div>
+			<template v-for="(apiData,index) in data.dataArr">
+				<template v-if="apiData.type === 'des'">
+					<div class="itemDiv" :id="'path-'+apiData.type">
+						<div class="title1">{{index+1}}. {{apiData.title}}</div>
+						<div class="title2 title2Base" v-html="apiData.data"></div>
+					</div>
+				</template>
+				<template v-if="apiData.type === 'apiDes'">
+					<div class="itemDiv" :id="'path-'+apiData.type">
+						<div class="title1">{{index+1}}. {{apiData.title}}</div>
+						<div class="title2 title2Base" id="apiDes"></div>
+					</div>
+				</template>
+				<template v-if="apiData.type === 'errorCode'">
+					<div class="itemDiv" :id="'path-'+apiData.type">
+						<div class="title1">{{index+1}}. {{apiData.title}}</div>
+						<div class="title2 title2Base" v-html="apiData.data"></div>
+					</div>
+				</template>
+				<template v-if="apiData.type === 'apiDefined'">
+					<div class="itemDiv" :id="'path-'+apiData.type">
+						<div class="title1">{{index+1}}. {{apiData.title}}</div>
+						<div class="title2 title2Base apiIList">
+							<div v-for="(pathValue, pathKey, pathIndex) in apiData.data.paths" class="item">
+								<div v-for="(funValue, funKey, funIndex) in pathValue">
+									<div class="name title2" :id="funValue.summary + pathKey">
+										{{index+1}}.{{pathIndex+1}}. {{funValue["summary"]}}
+									</div>
+									<div class="path">
+										URL：{{urlBase}}{{pathKey}}
+									</div>
+									<div class="path">
+										请求方法：{{funKey}}
+									</div>
+									<div class="path" v-if="funValue.description" v-html="markedDes(funValue.description)">
+									</div>
+									<template v-if="funValue.hasRequestHeader">
+										<div class="smallTitle">{{index+1}}.{{pathIndex+1}}.1 请求header：</div>
+										<table>
+											<tr>
+												<th>参数名</th>
+												<th>类型</th>
+												<th>是否必须</th>
+												<th>描述</th>
+												<th>示例</th>
+											</tr>
+											<template v-if="funValue.parameters">
+												<template v-for="propertyItem in funValue.parameters" v-if="propertyItem.in && propertyItem.in === 'header'">
+													<tr>
+														<td v-if="propertyItem && propertyItem.name">{{propertyItem["name"]}}</td>
+														<td v-if="propertyItem && propertyItem.schema && propertyItem.schema.type">{{propertyItem["schema"]["type"]}}</td>
+														<td v-else>&nbsp;</td>
+														<td v-if="propertyItem && propertyItem.required != 'undefined'">{{propertyItem["required"]}}</td>
+														<td v-else>&nbsp;</td>
+														<td v-if="propertyItem && propertyItem.description" v-html="marked(propertyItem.description)"></td>
+														<td v-else>&nbsp;</td>
+														<td v-if="propertyItem && propertyItem.example">{{propertyItem["schema"]["example"]}}</td>
+														<td v-else>&nbsp;</td>
+													</tr>
+												</template>
+											</template>
+										</table>
+									</template>
+									<template v-if="!funValue.hasRequestHeader">
+										<div class="smallTitle">{{index+1}}.{{pathIndex+1}}.1 请求header：</div>
+										<div>无</div>
+									</template>
+									<div class="smallTitle">{{index+1}}.{{pathIndex+1}}.2 请求参数：</div>
+										<template v-if="funValue.parameters && funValue.hasRequestQuery">
+											<table>
+											<tr>
+												<th>参数名</th>
+												<th>类型</th>
+												<th>是否必须</th>
+												<th>描述</th>
+												<th>示例</th>
+											</tr>
+											<template v-for="propertyItem in funValue.parameters"  v-if="propertyItem.in && propertyItem.in === 'query'">
+												<tr>
+													<td v-if="propertyItem && propertyItem.name">{{propertyItem["name"]}}</td>
+													<td v-if="propertyItem && propertyItem.schema && propertyItem.schema.type">{{propertyItem["schema"]["type"]}}</td>
+													<td v-else>&nbsp;</td>
+													<td v-if="propertyItem && propertyItem.required != 'undefined'">{{propertyItem["required"]}}</td>
+													<td v-else>&nbsp;</td>
+													<td v-if="propertyItem && propertyItem.description" v-html="marked(propertyItem.description)"></td>
+													<td v-else>&nbsp;</td>
+													<td v-if="propertyItem && propertyItem.example">{{propertyItem["schema"]["example"]}}</td>
+													<td v-else>&nbsp;</td>
+												</tr>
+											</template>
+										    </table>
+										</template>
+										<template v-if="funValue.requestBody && funValue.requestBody.content && funValue.requestBody.content['application/json'] && funValue.requestBody.content['application/json'].schema && funValue.requestBody.content['application/json'].schema.properties">
+											<template v-if="funValue.requestBody.content['application/json'].schema.propertiesArr">
+												<el-table style="margin-top: 30px;" :data="funValue.requestBody.content['application/json'].schema.propertiesArr" row-key="name" class="eleTable" highlight-current-row="false"
+												 border="false" default-expand-all :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+													<el-table-column prop="name" label="参数名">
+													</el-table-column>
+													<el-table-column prop="type" label="类型">
+													</el-table-column>
+													<el-table-column prop="required" label="是否必须">
+													</el-table-column>
+													<el-table-column prop="description" label="描述">
+													</el-table-column>
+													<el-table-column prop="example" label="示例">
+													</el-table-column>
+												</el-table>
+											</template>
+											<template v-else>
+												<template v-if="!funValue.hasRequestQuery">
+													<div>无</div>
+												</template>
+											</template>
+										</template>
+										<template v-else>
+											<template v-if="!funValue.hasRequestQuery">
+												<div>无</div>
+											</template>
+										</template>
+									<template v-if="funValue.hasResponsesHeader">
+										<div class="smallTitle">{{index+1}}.{{pathIndex+1}}.3 响应Header :</div>
+										<table>
+											<tr>
+												<th>参数名</th>
+												<th>类型</th>
+												<th>描述</th>
+											</tr>
+											<template v-for="(propertyValue, propertyKey, propertyIndex) in funValue.responses['200'].headers">
+												<tr>
+													<td>{{propertyKey}}</td>
+													<td v-if="propertyValue && propertyValue.schema && propertyValue.schema.type">{{propertyValue["schema"]["type"]}}</td>
+													<td v-if="propertyValue && propertyValue.description">{{propertyValue["description"]}}</td>
+												</tr>
+											</template>
+										</table>
+									</template>
+									<template v-if="!funValue.hasResponsesHeader">
+										<div class="smallTitle">{{index+1}}.{{pathIndex+1}}.3 响应Header :</div>
+										<div>无</div>
+									</template>
+									<div class="smallTitle">{{index+1}}.{{pathIndex+1}}.4 响应：</div>
+
+									<template v-if="funValue.responses && funValue.responses['200'] && funValue.responses['200'].content && funValue.responses['200'].content['application/json'] && funValue.responses['200'].content['application/json'].schema && funValue.responses['200'].content['application/json'].schema.properties">
+										<!--复杂返回-->
+										<template v-if="funValue.responses['200'].content['application/json'].schema.properties.data && funValue.responses['200'].content['application/json'].schema.properties.data.properties">
+											<template v-for="(propertyValue, propertyKey, propertyIndex) in funValue.responses['200'].content['application/json'].schema.properties">
+												<template v-if="propertyKey == 'data' && propertyValue.properties">
+													<template v-if="propertyValue.propertiesArr">
+														<el-table :data="propertyValue.propertiesArr" row-key="key" class="eleTable" highlight-current-row="false"
+														 border="false" default-expand-all :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+															<el-table-column prop="name" label="参数名">
+															</el-table-column>
+															<el-table-column prop="type" label="类型">
+															</el-table-column>
+															<el-table-column prop="description" label="描述">
+															</el-table-column>
+															<el-table-column prop="example" label="示例">
+															</el-table-column>
+														</el-table>
+													</template>
+												</template>
+											</template>
+										</template>
+										<!--简单返回-->
+										<template v-else>
+											<table>
+												<tr>
+													<th>参数名</th>
+													<th>类型</th>
+													<th>描述</th>
+													<th>示例</th>
+												</tr>
+												<template v-for="(propertyValue, propertyKey, propertyIndex) in funValue.responses['200'].content['application/json'].schema.properties">
+													<tr>
+														<td>{{propertyKey}}</td>
+														<td v-if="propertyValue && propertyValue.type">{{propertyValue["type"]}}</td>
+														<td v-else>&nbsp;</td>
+														<td v-if="propertyValue && propertyValue.description">{{propertyValue["description"]}}</td>
+														<td v-else>&nbsp;</td>
+														<td v-if="propertyValue && propertyValue.example">{{propertyValue["example"]}}</td>
+														<td v-else>&nbsp;</td>
+													</tr>
+												</template>
+											</table>
+										</template>
+									</template>
+
+									<div class="smallTitle">{{index+1}}.{{pathIndex+1}}.5 示例：</div>
+									<div class="examples">
+										<div>{</div>
+										<template v-if="funValue.responses && funValue.responses['200'] && funValue.responses['200'].content && funValue.responses['200'].content['application/json'] && funValue.responses['200'].content['application/json'].schema && funValue.responses['200'].content['application/json'].schema.properties">
+											<!--复杂返回-->
+											<template v-if="funValue.responses['200'].content['application/json'].schema.properties.data && funValue.responses['200'].content['application/json'].schema.properties.data.properties">
+												<template v-for="(propertyValue, propertyKey, propertyIndex) in funValue.responses['200'].content['application/json'].schema.properties">
+													<template v-if="propertyKey == 'data' && propertyValue.properties">
+														<template v-if="propertyValue.propertiesArr">
+															<div style="text-indent: 30px;">"{{propertyKey}}" : </div>
+															<div style="text-indent: 30px;">{</div>
+															<template v-for="codeItem in propertyValue.propertiesArr">
+																<div class="item" style="text-indent: 60px;">"{{codeItem.name}}" :
+																	<template v-if="codeItem && codeItem.example && codeItem.type !== 'object' ">
+																		"{{codeItem.example}}"
+																	</template>
+																</div>
+																<!--解析第二层-->
+																<template v-if="codeItem.children">
+																	<div style="text-indent: 60px;">{</div>
+																	<template v-for="secondCodeValue in codeItem.children">
+																		<div class="item" style="text-indent: 90px;">"{{secondCodeValue.name}}" :
+																			<template v-if="secondCodeValue && secondCodeValue.example && secondCodeValue.type !== 'object'"></template>
+																			"{{secondCodeValue.example}}",
+																		</div>
+																		<!--解析第三层-->
+																		<template v-if="secondCodeValue.children">
+																			<div style="text-indent: 90px;">{</div>
+																			<template v-for="thirdCodeValue in secondCodeValue.children">
+																				<div class="item" style="text-indent: 120px;">"{{thirdCodeValue.name}}" :
+																					<template v-if="thirdCodeValue && thirdCodeValue.example && thirdCodeValue.type !== 'object'"></template>
+																					"{{thirdCodeValue.example}}",
+																				</div>
+																			</template>
+																			<div style="text-indent: 90px;">},</div>
+																		</template>
+																	</template>
+																	<div style="text-indent: 60px;">},</div>
+																</template>
+															</template>
+															<div style="text-indent: 30px;">}</div>
+														</template>
+
+													</template>
+													<template v-else>
+														<div class="item" style="text-indent: 30px;">"{{propertyKey}}" : "
+															<template v-if="propertyValue && propertyValue.example">{{propertyValue.example}}</template>
+															",
+														</div>
+													</template>
+												</template>
+											</template>
+											<!--简单返回-->
+											<template v-else>
+												<template v-for="(propertyValue, propertyKey, propertyIndex) in funValue.responses['200'].content['application/json'].schema.properties">
+													<div class="item" style="text-indent: 30px;">"{{propertyKey}}" : "
+														<template v-if="propertyValue && propertyValue.example">{{propertyValue.example}}</template>
+														",
+													</div>
+												</template>
+											</template>
+										</template>
+										<div>}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</template>
+			</template>
+		</div>
+	</body>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script type="text/javascript" src="js/partner.js"></script>
+	<script type="text/javascript" src="js/router.js"></script>
+	<script src="js/vue.js "></script>
+	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<script>
+		Vue.prototype.marked = function(msg) {
+			return marked(msg);
+		};
+		Vue.prototype.markedDes = function(msg) {
+			return marked("说明：" + msg);
+		};
+
+		//页面配置信息
+		var showData = {};
+		var analyseDocument;
+		var systemName = "合作伙伴";
+		var systemType = "后端";
+		var selectTag = "Partner";
+		var selectTag2 = "Partner-points-core";
+		var selectTag3 = "积分系统-B端接口";
+
+		var thisVm;
+		new Vue({
+			el: '#templete',
+			data: {
+				data: [],
+				pageData: router,
+				sliderData: [],
+				urlBase: '',
+				lastClickItem: null
+			},
+			computed: {},
+			methods: {
+				updateData(){
+					window.openWin = window.open('./websocket.html','','width=400,height=400');
+				},
+				scrollToItem: function(item) {
+					location.hash = "#" + item.path;
+					if (this.lastClickItem) {
+						this.lastClickItem.active = 'N';
+					}
+					Vue.set(item, 'active', 'Y')
+					this.lastClickItem = item;
+
+				},
+				switchItem: function(item) {
+					if (item.url) {
+						location.href = item.url;
+						return;
+					}
+					location.hash = "#" + item.path;
+					if (this.lastClickItem) {
+						this.lastClickItem.active = 'N';
+					}
+					Vue.set(item, 'active', 'Y')
+					this.lastClickItem = item;
+				}
+			},
+			mounted: function() {
+				thisVm = this;
+				init();
+			},
+			filters: {
+				formatMark: function(value) {
+					return marked(value);
+				}
+			}
+		})
+
+		function init() {
+			analyseDocument = partner;
+			analyse(analyseDocument, "components");
+			analyse(analyseDocument, "paths");
+			dealAllOf(analyseDocument, "components");
+			dealAllOf(analyseDocument, "paths");
+
+			deal(analyseDocument);
+
+			//处理请求header
+			formatReqHeader(showData);
+
+			//处理表格多层显示
+			tableDataFormat(analyseDocument);
+			thisVm.urlBase = analyseDocument.servers[0].url;
+
+			formatData(analyseDocument);
+		}
+
+		//数据分部分
+		function formatData(data) {
+			var resultData = [];
+			resultData.push({
+				title: systemName + "说明",
+				type: "des",
+				data: ""
+			});
+
+			if (data.components.schemas && data.components.schemas.ErrorCode && data.components.schemas.ErrorCode.description) {
+				resultData.push({
+					title: "错误码定义",
+					type: "errorCode",
+					data: marked(data.components.schemas.ErrorCode.description)
+				});
+			}
+			resultData.push({
+				title: "接口定义",
+				type: "apiDefined",
+				data: data
+			});
+
+			for (var i = 0; i < resultData.length; i++) {
+				if (resultData[i].type === "des") {
+					var tempDes = data.info.description;
+					var tempDesArr = tempDes.split("\n--------\n");
+					var resultDes = '';
+					for (var j = 0; j < tempDesArr.length; j++) {
+						if (tempDesArr[j].indexOf('[knowledge base]') != -1) {
+							resultDes += tempDesArr[j];
+						}
+					}
+					resultDes = resultDes.replace(/\[knowledge base\]/g, "");
+					if (resultDes == '') {
+						resultData.shift();
+					} else {
+						var obj = addIndex($("<div>" + marked(resultDes) + "</div>"), i + 1);
+						resultData[i].data = obj.data;
+						resultData[i].arr = obj.arr;
+					}
+				}
+			}
+
+			thisVm.data = {
+				dataArr: resultData,
+				titleInfo: {
+					title: systemName + systemType + "API",
+					version: "版本：" + data.info.version
+				}
+			};
+			getSlider(resultData);
+		}
+
+		//添加索引
+		function addIndex(ele, index) {
+			var selectArr = $(ele).find("h1,h2,h3");
+			var tempH1Index = 0;
+			var tempH2Index = 0;
+			var tempH3Index = 0;
+			var hasH1 = false;
+
+			var childArr = [];
+
+			for (var i = 0; i < selectArr.length; i++) {
+				if ($(selectArr[i])[0].tagName == 'H1') {
+					tempH1Index++;
+					hasH1 = true;
+					tempH2Index = 0;
+					tempH3Index = 0;
+					childArr.push({
+						name: $(selectArr[i]).text(),
+						path: "path-" + $(selectArr[i]).text(),
+						active: 'N'
+					});
+					$(selectArr[i]).attr('id', "path-" + $(selectArr[i]).text());
+					$(selectArr[i]).text(index + "." + tempH1Index + " " + $(selectArr[i]).text());
+				}
+				if ($(selectArr[i])[0].tagName == 'H2') {
+					tempH2Index++;
+					tempH3Index = 0;
+					if (!hasH1) {
+						childArr.push({
+							name: $(selectArr[i]).text(),
+							path: "path-" + $(selectArr[i]).text(),
+							active: 'N'
+						});
+						$(selectArr[i]).attr('id', "path-" + $(selectArr[i]).text());
+						$(selectArr[i]).text(index + "." + tempH2Index + " " + $(selectArr[i]).text());
+					} else {
+						$(selectArr[i]).text(index + "." + tempH1Index + "." + tempH2Index + " " + $(selectArr[i]).text());
+					}
+
+				}
+				if ($(selectArr[i])[0].tagName == 'H3') {
+					tempH3Index++;
+					if (!hasH1) {
+						$(selectArr[i]).text(index + "." + tempH2Index + "." + tempH3Index + " " + $(selectArr[i]).text());
+					} else {
+						$(selectArr[i]).text(index + "." + tempH1Index + "." + tempH2Index + "." + tempH3Index + " " + $(selectArr[i]).text());
+					}
+
+				}
+			}
+			return {
+				data: ele.html(),
+				arr: childArr
+			};
+		}
+
+		//处理请求header
+		function formatReqHeader(data) {
+			for(var pathItem in data.paths) {
+				for(var funKey in data.paths[pathItem]) {
+					data.paths[pathItem][funKey].hasRequestHeader = false;
+					data.paths[pathItem][funKey].hasRequestQuery = false;
+					data.paths[pathItem][funKey].hasResponsesHeader = false;
+					if(data.paths[pathItem][funKey].parameters) {
+						for(var i = 0; i < data.paths[pathItem][funKey].parameters.length; i++) {
+							if(data.paths[pathItem][funKey].parameters[i].in && data.paths[pathItem][funKey].parameters[i].in === 'header') {
+								data.paths[pathItem][funKey].hasRequestHeader = true;
+							}
+							if(data.paths[pathItem][funKey].parameters[i].in && data.paths[pathItem][funKey].parameters[i].in === 'query') {
+								data.paths[pathItem][funKey].hasRequestQuery = true;
+							}
+						}
+					}
+					if(data.paths[pathItem][funKey].responses && data.paths[pathItem][funKey].responses['200'] && data.paths[pathItem][funKey].responses['200'].headers) {
+						data.paths[pathItem][funKey].hasResponsesHeader = true;
+					}
+				}
+			}
+		}
+
+		//获取导航栏标签
+		function getSlider(dataArr) {
+			var result = [];
+			for (var i = 0; i < dataArr.length; i++) {
+				if (dataArr[i].type === "apiDefined") {
+					var arr = [];
+					for (var pathItem in dataArr[i].data.paths) {
+						for (var typeItem in dataArr[i].data.paths[pathItem]) {
+							arr.push({
+								path: dataArr[i].data.paths[pathItem][typeItem].summary + pathItem,
+								name: dataArr[i].data.paths[pathItem][typeItem].summary,
+								active: 'N'
+							})
+						}
+					}
+					result.push({
+						name: dataArr[i].title,
+						path: "path-" + dataArr[i].type,
+						arr: arr
+					});
+				} else {
+					result.push({
+						name: dataArr[i].title,
+						path: "path-" + dataArr[i].type,
+						arr: dataArr[i].arr ? dataArr[i].arr : []
+					});
+				}
+
+			}
+			thisVm.sliderData = result;
+		}
+
+		//表格数据 需要 对象转数组
+		function tableDataFormat(data) {
+			for (var pathItem in data.paths) {
+				for (var funKey in data.paths[pathItem]) {
+					if (data.paths[pathItem][funKey].responses && data.paths[pathItem][funKey].responses['200'].content['application/json'].schema.properties.data && data.paths[pathItem][funKey].responses['200'].content['application/json'].schema.properties.data.properties) {
+						dataFormatStart(data.paths[pathItem][funKey].responses['200'].content['application/json'].schema.properties.data,"properties");
+					}
+					if (data.paths[pathItem][funKey].requestBody && data.paths[pathItem][funKey].requestBody.content['application/json'].schema) {
+						dataFormatStart(data.paths[pathItem][funKey].requestBody.content['application/json'].schema,"properties");
+					}
+				}
+			}
+		}
+
+		function dataFormatStart(data, propName) {
+			var tempObj = data[propName];
+			var tempArr = [];
+			var keyIndex = 1;
+			for (var tempKey in tempObj) {
+				var obj = {
+					name: tempKey,
+					type: tempObj[tempKey].type,
+					description: tempObj[tempKey].description,
+					example: tempObj[tempKey].example,
+					key: keyIndex++
+				}
+				if (tempObj[tempKey].type === 'object') {
+					var tempData = dataFormathandle(tempObj[tempKey], keyIndex);
+					obj.children = tempData.children;
+					keyIndex = tempData.index;
+				}
+				tempArr.push(obj);
+			}
+			data.propertiesArr = tempArr;
+		}
+
+		function dataFormathandle(data, keyIndex) {
+			if (data.type && data.type === 'object' && data.properties) {
+				return dataFormathandle(data.properties)
+			} else if (data.type && (data.type === 'string' || data.type === 'integer')) {
+				return {
+					children: [],
+					index: keyIndex
+				}
+			} else {
+				var children = [];
+				for (var childrenKey in data) {
+					var childrenObj = {
+						name: childrenKey,
+						type: data[childrenKey].type,
+						description: data[childrenKey].description,
+						example: data[childrenKey].example,
+						key: keyIndex++
+					}
+					if (data[childrenKey].type === 'object') {
+						var tempData = dataFormathandle(data[childrenKey], keyIndex);
+						childrenObj.children = tempData.children;
+						keyIndex = tempData.index;
+					}
+					children.push(childrenObj);
+				}
+				return {
+					children: children,
+					index: keyIndex
+				};
+			}
+		}
+
+		function deal(data) {
+			//去除非public 接口
+			for (var pathItem in data.paths) {
+				for (var typeItem in data.paths[pathItem]) {
+					if (data.paths[pathItem] && (!data.paths[pathItem][typeItem].tags || (data.paths[pathItem][typeItem].tags.indexOf(
+							selectTag) == -1 && data.paths[pathItem][typeItem].tags.indexOf(selectTag2) == -1 && data.paths[pathItem][
+							typeItem
+						].tags.indexOf(selectTag3) == -1))) {
+						delete data.paths[pathItem];
+					}
+				}
+			}
+		}
+
+		function merge(origin, target) {
+			for (var typeItem in target) {
+				if (origin[typeItem]) {
+					target[typeItem].responses["200"].headers = origin[typeItem].responses["200"].headers;
+				}
+			}
+		}
+
+		//处理数据
+		function analyse(parent, props) {
+			for (var item in parent[props]) {
+				if (item === '$ref') {
+					var temp = "";
+					if (parent[props]["tags"]) {
+						temp = JSON.stringify(parent[props]["tags"]);
+					}
+					var itemArr = parent[props][item].split("/");
+					if (analyseDocument[itemArr[1]] && analyseDocument[itemArr[1]][itemArr[2]] && analyseDocument[itemArr[1]][itemArr[
+							2]][itemArr[3]]) {
+						parent[props] = JSON.parse(JSON.stringify(analyseDocument[itemArr[1]][itemArr[2]][itemArr[3]]));
+					} else {
+						parent[props] = {};
+					}
+					if (temp !== "") {
+						parent[props]["tags"] = JSON.parse(temp);
+					}
+					analyse(parent, props);
+				}
+				if (item === "multipart/form-data") {
+					parent[props]["application/json"] = parent[props][item];
+				}
+				if (item === "type" && parent[props][item] == 'array' && parent[props].items) {
+					parent[props]["properties"] = parent[props].items;
+					parent[props][item] = 'object';
+				}
+				if (typeof parent[props][item] === 'object') {
+					analyse(parent[props], item);
+				}
+			}
+		}
+
+		function dealAllOf(parent, props) {
+			for (var item in parent[props]) {
+				if (item === "allOf") {
+					parent[props] = mergeObj(parent[props][item]);
+				}
+				if (typeof parent[props][item] === 'object') {
+					dealAllOf(parent[props], item);
+				}
+			}
+		}
+
+		function mergeObj(arr) {
+			if (arr.length === 0) {
+				return;
+			}
+			if (arr.length === 1) {
+				return arr[0];
+			}
+			var tempObj = arr[0];
+			if (tempObj.allOf) {
+				tempObj = mergeObj(tempObj.allOf);
+			}
+			for (var i = 0; i < arr.length; i++) {
+				if (arr[i].allOf) {
+					mergeObj(arr[i].allOf);
+				}
+				if (arr[i].properties) {
+					for (var item in arr[i].properties) {
+						tempObj.properties[item] = arr[i].properties[item];
+					}
+				}
+			}
+			return tempObj;
+		}
+	</script>
+
+</html>

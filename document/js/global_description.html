@@ -1,0 +1,17 @@
+<h2>接口响应</h2>
+<p>接口返回格式统一为</p>
+<pre><code>{
+    &quot;code&quot;: 0,
+    &quot;message&quot;: &quot;success&quot;,
+    &quot;internal&quot;: false,
+    &quot;data&quot;: {
+    }
+}
+</code></pre>
+<ul>
+<li><code>http status</code>: <code>200</code> 和 <code>500</code>，除内部错误为<code>500</code>外，其它均为<code>200</code>，业务错误码通过<code>code</code>标识</li>
+<li><code>code</code>： 错误码标识，只有为<code>0</code>表示成功</li>
+<li><code>message</code>:简要说明，如<code>code</code>为<code>0</code>时值为<code>success</code></li>
+<li><code>data</code>：接口返回具体的数据，部分接口<code>data</code>为空</li>
+<li><code>internal</code>:在<code>code!=0</code>时出现，用于标识错误，<code>有且为false时</code>，message的信息可以直接展示，否则不应直接展示message内容</li>
+</ul>

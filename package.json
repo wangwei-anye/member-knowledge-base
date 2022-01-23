@@ -1,0 +1,20 @@
+{
+  "name": "yaml",
+  "version": "1.0.0",
+  "description": "",
+  "author": "anye",
+  "scripts": {
+    "start": "node start.js",
+    "copy": "node copy.js",
+    "load": "node load.js",
+    "test": "node testDemo.js",
+    "server": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "markdown-it": "^9.1.0",
+    "shelljs": "^0.8.3",
+    "yaml-to-json": "^0.3.0",
+    "yamljs": "^0.3.0"
+  }
+}

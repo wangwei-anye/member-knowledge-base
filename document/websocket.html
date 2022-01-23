@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<pre id="log"></pre>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script>
+  var hasUpdating = false;
+  checkStatus();
+  function checkStatus() {
+    var that = this;
+    $.ajax({
+      type: "GET",
+      url: "http://112.74.181.137:20092/?action=check",
+      dataType: "json",
+      success: function(res) {
+        if (res == "0") {
+          hasUpdating = true;
+          that.start();
+        } else {
+          log("其他用户正在更新文档");
+        }
+      }
+    });
+  }
+
+  function start() {
+    updating();
+    var ws = new WebSocket("ws://112.74.181.137:20091/");
+    ws.onopen = function() {
+      log("CONNECT");
+    };
+    ws.onclose = function() {
+      log("DISCONNECT");
+      undeted();
+    };
+    ws.onmessage = function(event) {
+      log("MESSAGE: " + event.data);
+    };
+  }
+
+  function log(msg) {
+    document.getElementById("log").textContent += msg + "\n";
+  }
+
+  window.onbeforeunload = function(event) {
+	if (hasUpdating) {
+      undeted();
+    }
+  };
+
+  window.onunload = function(event) {
+	if (hasUpdating) {
+      undeted();
+    }
+  };
+
+  function undeted() {
+    $.ajax({
+      type: "GET",
+      url: "http://112.74.181.137:20092/?action=updated",
+      dataType: "json",
+      success: function(res) {
+        window.close();
+      }
+    });
+  }
+
+  function updating() {
+    $.ajax({
+      type: "GET",
+      url: "http://112.74.181.137:20092/?action=updating",
+      dataType: "json",
+      success: function(res) {}
+    });
+  }
+</script>
